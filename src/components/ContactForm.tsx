@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import emailjs from '@emailjs/browser';
 
 type FormData = {
   name: string;
@@ -27,24 +28,43 @@ export default function ContactForm() {
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
 
+  // Initialize EmailJS
+  emailjs.init('xHqGzfrKsOwlAkVl8');
+
   const onSubmit = async (data: FormData) => {
     setIsSubmitting(true);
     try {
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('email', data.email);
-      formData.append('message', data.message);
+      // Convert files to base64 for EmailJS
+      const attachments: { name: string; data: string; type: string }[] = [];
+      for (const file of selectedFiles) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+        attachments.push({
+          name: file.name,
+          data: base64,
+          type: file.type,
+        });
+      }
 
-      selectedFiles.forEach((file, index) => {
-        formData.append('attachments', file);
-      });
+      // Prepare template parameters
+      const templateParams = {
+        from_name: data.name,
+        from_email: data.email,
+        message: data.message,
+        attachments: attachments.length > 0 ? JSON.stringify(attachments) : '',
+      };
 
-      const response = await fetch('/api/send-wish', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error('Failed to send wish');
+      // Send email using EmailJS
+      await emailjs.send(
+        'service_rbqkqjk',
+        'template_e7dror8',
+        templateParams,
+        'xHqGzfrKsOwlAkVl8'
+      );
 
       setSubmitStatus('success');
       reset();
