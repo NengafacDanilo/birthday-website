@@ -13,7 +13,7 @@ const random = (min: number, max: number) => Math.floor(Math.random() * (max - m
 
 const Sparkle = ({ color = '#FFF', size = 4, style }: SparkleProps) => {
   const path = `M${size / 2} 0 L${size} ${size / 2} L${size / 2} ${size} L0 ${size / 2} Z`;
-  
+
   return (
     <motion.svg
       width={size}
@@ -46,42 +46,56 @@ interface SparklesProps {
   maxSize?: number;
 }
 
+interface SparkleData {
+  id: number;
+  color: string;
+  size: number;
+  style: React.CSSProperties;
+  top: string;
+  left: string;
+}
+
 export const Sparkles = ({ children, colors = ['#FFD700', '#FFA07A', '#FF69B4'] }: SparklesProps) => {
-  const [sparkles, setSparkles] = useState<Array<{ id: number; color: string; size: number; style: any }>>([]);
+  const [sparkles, setSparkles] = useState<SparkleData[]>([]);
 
   useEffect(() => {
-    const generateSparkle = () => ({
-      id: Math.random(),
-      color: colors[Math.floor(Math.random() * colors.length)],
-      size: random(10, 20),
-      style: {
-        position: 'absolute',
-        top: `${random(-20, 120)}%`,
-        left: `${random(-20, 120)}%`,
-        zIndex: 2,
-      },
-    });
+    const generateSparkles = () => {
+      const newSparkles: SparkleData[] = [];
+      for (let i = 0; i < 10; i++) { // Fixed number of sparkles
+        newSparkles.push({
+          id: i,
+          color: colors[i % colors.length],
+          size: 10 + (i % 10), // Deterministic size
+          top: `${(i * 10) % 100}%`,
+          left: `${(i * 15) % 100}%`,
+          style: {
+            position: 'absolute',
+            zIndex: 2,
+          },
+        });
+      }
+      setSparkles(newSparkles);
+    };
 
-    const interval = setInterval(() => {
-      const sparkle = generateSparkle();
-      setSparkles(prev => [...prev, sparkle]);
-      setTimeout(() => {
-        setSparkles(prev => prev.filter(s => s.id !== sparkle.id));
-      }, 1000);
-    }, 300);
-
-    return () => clearInterval(interval);
+    generateSparkles();
   }, [colors]);
 
   return (
     <div className="relative inline-block">
       {sparkles.map(sparkle => (
-        <Sparkle
+        <div
           key={sparkle.id}
-          color={sparkle.color}
-          size={sparkle.size}
-          style={sparkle.style as React.CSSProperties}
-        />
+          style={{
+            ...sparkle.style,
+            top: sparkle.top,
+            left: sparkle.left,
+          }}
+        >
+          <Sparkle
+            color={sparkle.color}
+            size={sparkle.size}
+          />
+        </div>
       ))}
       <div className="relative z-1">{children}</div>
     </div>

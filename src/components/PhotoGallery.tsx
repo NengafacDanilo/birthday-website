@@ -8,16 +8,17 @@ interface Photo {
   id: number;
   src: string;
   alt: string;
+  rotation: number;
 }
 
 // Example photos - replace with your actual photos
 const photos: Photo[] = [
-  { id: 1, src: '/photos/4K6A7152.jpg', alt: 'Birthday memory 1' },
-  { id: 2, src: '/photos/4K6A7305.jpg', alt: 'Birthday memory 2' },
-  { id: 3, src: '/photos/4K6A7303.jpg', alt: 'Birthday memory 3' },
-  { id: 4, src: '/photos/4K6A7153.jpg', alt: 'Birthday memory 4' },
-  { id: 5, src: '/photos/4K6A7398.jpg', alt: 'Birthday memory 5' },
-  { id: 6, src: '/photos/4K6A7398.jpg', alt: 'Birthday memory 6' },
+  { id: 1, src: '/photos/4K6A7152.jpg', alt: 'Birthday memory 1', rotation: -2.5 },
+  { id: 2, src: '/photos/4K6A7305.jpg', alt: 'Birthday memory 2', rotation: 2.4 },
+  { id: 3, src: '/photos/4K6A7303.jpg', alt: 'Birthday memory 3', rotation: -1.97 },
+  { id: 4, src: '/photos/4K6A7153.jpg', alt: 'Birthday memory 4', rotation: 1.97 },
+  { id: 5, src: '/photos/4K6A7398.jpg', alt: 'Birthday memory 5', rotation: -0.18 },
+  { id: 6, src: '/photos/4K6A7398.jpg', alt: 'Birthday memory 6', rotation: 0.36 }
 ];
 
 const PhotoGallery = () => {
@@ -41,7 +42,7 @@ const PhotoGallery = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
-              className="relative aspect-square rounded-lg overflow-hidden cursor-pointer"
+              className={`relative aspect-square rounded-lg overflow-hidden cursor-pointer transform rotate-${photo.rotation} hover:rotate-0 transition-transform duration-300`}
               onClick={() => setSelectedPhoto(photo)}
             >
               <Image

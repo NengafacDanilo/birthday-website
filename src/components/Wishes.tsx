@@ -9,6 +9,7 @@ interface Wish {
   message: string;
   author: string;
   color: string;
+  rotation: number;
 }
 
 const initialWishes: Wish[] = [
@@ -16,19 +17,22 @@ const initialWishes: Wish[] = [
     id: 1,
     message: "Happy birthday! May your day be filled with joy and laughter!",
     author: "Sarah",
-    color: "bg-pink-500"
+    color: "bg-pink-500",
+    rotation: -2.5
   },
   {
     id: 2,
     message: "Wishing you the most amazing birthday ever!",
     author: "Mike",
-    color: "bg-purple-500"
+    color: "bg-purple-500",
+    rotation: 1.5
   },
   {
     id: 3,
     message: "Another year of amazing memories with you. Happy Birthday!",
     author: "Emma",
-    color: "bg-blue-500"
+    color: "bg-blue-500",
+    rotation: -1.2
   }
 ];
 
@@ -48,7 +52,8 @@ const Wishes = () => {
       id: wishes.length + 1,
       message,
       author,
-      color: colors[Math.floor(Math.random() * colors.length)]
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 6 - 3
     };
     setWishes([...wishes, newWish]);
   };
@@ -77,7 +82,7 @@ const Wishes = () => {
               whileInView={{ opacity: 1, scale: 1 }}
               whileHover={{ scale: 1.05 }}
               transition={{ duration: 0.3 }}
-              className={`${wish.color} rounded-lg p-6 transform rotate-${Math.random() * 6 - 3} hover:rotate-0 transition-transform duration-300`}
+              className={`${wish.color} rounded-lg p-6 transform rotate-${wish.rotation} hover:rotate-0 transition-transform duration-300`}
             >
               <p className="text-white text-lg mb-4 font-medium italic">
                 "{wish.message}"

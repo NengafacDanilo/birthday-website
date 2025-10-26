@@ -5,6 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import Sparkles from './Sparkles';
 
+interface Balloon {
+  id: number;
+  x: string;
+  duration: number;
+  delay: number;
+  background: string;
+  transform: string;
+}
+
 const Hero = () => {
   const [timeLeft, setTimeLeft] = useState({
     days: 0,
@@ -12,6 +21,8 @@ const Hero = () => {
     minutes: 0,
     seconds: 0
   });
+
+  const [balloons, setBalloons] = useState<Balloon[]>([]);
 
   useEffect(() => {
     // Set your target date here (example: December 25, 2025)
@@ -36,19 +47,22 @@ const Hero = () => {
   }, []);
 
   useEffect(() => {
-    const createBalloon = () => {
-      const balloons = document.querySelectorAll('.balloon');
-      balloons.forEach(balloon => {
-        const randomDelay = Math.random() * 2000;
-        setTimeout(() => {
-          balloon.classList.add('floating');
-        }, randomDelay);
-      });
+    const generateBalloons = () => {
+      const newBalloons: Balloon[] = [];
+      for (let i = 0; i < 15; i++) {
+        newBalloons.push({
+          id: i,
+          x: `${(i * 7.14)}vw`, // Distribute evenly across viewport
+          duration: 10 + (i % 5) * 2, // Vary duration between 10-20 seconds
+          delay: i * 0.5, // Stagger delays
+          background: `hsl(${(i * 24) % 360}, 70%, 50%)`, // Deterministic colors
+          transform: `translateX(${(i * 7.14)}vw) translateY(100vh) scale(0.5)`
+        });
+      }
+      setBalloons(newBalloons);
     };
 
-    const interval = setInterval(createBalloon, 3000);
-    createBalloon();
-    return () => clearInterval(interval);
+    generateBalloons();
   }, []);
 
   const shootConfetti = useCallback(() => {
@@ -185,14 +199,14 @@ const Hero = () => {
 
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <AnimatePresence>
-              {[...Array(15)].map((_, index) => (
+              {balloons.map((balloon) => (
                 <motion.div
-                  key={index}
+                  key={balloon.id}
                   className="balloon absolute"
                   initial={{
                     opacity: 0,
                     y: '100vh',
-                    x: `${Math.random() * 100}vw`,
+                    x: balloon.x,
                     scale: 0.5
                   }}
                   animate={{
@@ -202,15 +216,15 @@ const Hero = () => {
                     rotate: [0, 10, -10, 0]
                   }}
                   transition={{
-                    duration: Math.random() * 10 + 10,
+                    duration: balloon.duration,
                     repeat: Infinity,
-                    delay: Math.random() * 5,
+                    delay: balloon.delay,
                     ease: 'easeInOut'
                   }}
                   style={{
                     width: '3rem',
                     height: '4rem',
-                    background: `hsl(${Math.random() * 360}, 70%, 50%)`,
+                    background: balloon.background,
                     borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
                     boxShadow: '0 4px 8px rgba(0,0,0,0.1)'
                   }}
