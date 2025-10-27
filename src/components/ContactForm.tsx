@@ -55,13 +55,13 @@ export default function ContactForm() {
         from_name: data.name,
         from_email: data.email,
         message: data.message,
-        attachments: attachments.length > 0 ? JSON.stringify(attachments) : '',
+        attachments: attachments.length > 0 ? `Attached ${attachments.length} file(s): ${attachments.map(a => a.name).join(', ')}` : 'No attachments',
       };
 
       // Send email using EmailJS
       await emailjs.send(
         'service_rbqkqjk',
-        'template_e7dror8',
+        'template_0fx0imd',
         templateParams,
         'xHqGzfrKsOwlAkVl8'
       );
@@ -72,6 +72,7 @@ export default function ContactForm() {
     } catch (error) {
       setSubmitStatus('error');
       console.error('Failed to send wish:', error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}\n\nPlease check your EmailJS template ID and ensure it exists in your dashboard.`);
     } finally {
       setIsSubmitting(false);
     }
